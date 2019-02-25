@@ -1,6 +1,7 @@
 from block import Block
 from symbols import symbols
 import i3ipc
+from color import color
 
 class i3block(Block):
     def __init__(self, event):
@@ -11,7 +12,7 @@ class i3block(Block):
 
     async def _thread(self, loop):
         def on_workspace_focus(conn, e):
-            ws = conn.get_workspaces()
+            ws = self._i3conn.get_workspaces()
             output = self.draw_workspaces(ws)
             # send it to main thread
             self._cache = output
@@ -23,16 +24,16 @@ class i3block(Block):
         warr = [symbols["empty_workspace"] for i in range(10)]
         for w in ws:
             wval = ""
-            if w["urgent"]:
-                wval += "%{F#FF0000}"
+            if "urgent" in w and w["urgent"]:
+                wval += "%%{F%s}" % color["urgent"]
             if w["focused"]:
-                wval += "%{F#0000FF}"
+                wval += "%%{F%s}" % color["accent"]
             wval += symbols["workspace"]
             if w["focused"] or w["urgent"]:
                 wval += "%{F-}"
             warr[w["num"] - 1] = wval
 
-        warr = [("%%{A:w%d:}" % i) + w + "%{A}" for i, w in enumerate(warr)]
+        warr = [("%%{A:w%d:}" % (i + 1)) + w + "%{A}" for i, w in enumerate(warr)]
 
         output = " ".join(warr)
         return output

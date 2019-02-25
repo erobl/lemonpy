@@ -13,7 +13,7 @@ class Clock(Block):
 
     def get_time(self):
         t = datetime.now()
-        return t.strftime("%H:%M:%S")
+        return t.strftime("%H:%M")
 
 
     async def _thread(self, loop):
